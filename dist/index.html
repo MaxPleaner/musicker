@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>"Musicker"</title>
+    <link href="./styles/index.css" rel="stylesheet" />
+    <script src="./scripts/jquery.js"></script>
+    <script src="./scripts/RecordRTC.js"></script>
+    <script src="./scripts/index.js"></script>
+  </head>
+  <body>
+    <button id="record">record</button><br />
+    <div class="audio-section">
+      <form action="#" class="save">
+        <input class="name" placeholder="name" type="text" /><input type="submit" value="submit" />
+      </form>
+      <br />
+      <audio controls="">
+        <source id="audio-src" type="audio/ogg" />
+      </audio>
+    </div>
+    <script>
+      UI.init()
+    </script>
+  </body>
+</html>
