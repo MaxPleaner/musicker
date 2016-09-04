@@ -11,12 +11,11 @@
     <button id="record">record</button><br />
     <div class="audio-section">
       <form action="#" class="save">
-        <input class="name" placeholder="name" type="text" /><input type="submit" value="submit" />
+        <audio controls="">
+          <source id="audio-src" type="audio/ogg" />
+        </audio>
+        <br /><input name="name" placeholder="name" type="text" /><input type="submit" value="save" />
       </form>
-      <br />
-      <audio controls="">
-        <source id="audio-src" type="audio/ogg" />
-      </audio>
     </div>
     <script>
       UI.init()

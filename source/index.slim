@@ -15,13 +15,12 @@ html lang='en'
     br
 
     div.audio-section
-      form action='#' class='save'
-        input type='text' class='name' placeholder='name'
-        input type='submit' value='submit'
-      br
-      audio controls=''
-        source id="audio-src" type='audio/ogg'
-
+      form.save action="#"
+        audio controls=''
+          source id="audio-src" type='audio/ogg'
+        br
+        input type='text' name='name' placeholder='name'
+        input type='submit' value='save'
 
     javascript:
       UI.init()

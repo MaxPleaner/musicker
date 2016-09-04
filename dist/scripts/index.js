@@ -5,35 +5,57 @@
       this.addRecordClickListener();
       return this.addSaveListener();
     };
+    this.addSaveListener = function() {
+      return $(".save").off("submit").on("submit", function(e) {
+        var ajaxArgs, blob, fd, name;
+        name = $(e.currentTarget).find("[name='name']").val() || "";
+        blob = window.RTC && RTC.getBlob();
+        if (blob && (name.length > 0)) {
+          fd = new FormData();
+          fd.append("fname", name + ".wav");
+          fd.append("data", RTC.getBlob());
+          ajaxArgs = {
+            type: "POST",
+            url: 'http://localhost:4567/rtc_audio_upload',
+            data: fd,
+            processData: false,
+            contentType: false
+          };
+          $.ajax(ajaxArgs).then(function(data) {
+            return console.log(data);
+          });
+        }
+        return false;
+      });
+    };
     this.addRecordClickListener = function() {
       return $("#record").off("click").on("click", function(e) {
         var $el;
         $el = $(e.currentTarget);
         if ($el.attr("recording") === "true") {
           $el.attr("recording", "false");
-          return UI.stopRecording();
+          return audioUtil.stopRecording();
         } else {
           $el.attr("recording", "true");
-          record().then(processAudio)["catch"](processError);
+          audioUtil.record().then(audioUtil.processAudio);
           return $(".audio-section .save").hide();
         }
       });
     };
-    this.addSaveListener = function() {
-      return $(".save").off("submit").on("submit", function(e) {
-        var $el, name;
-        if (!window.RTC) {
-          return;
-        }
-        $el = $(e.currentTarget);
-        name = $el.find(".name").val();
-        if (name.length < 1) {
-          name = "musicker-download-" + (Date.now());
-        }
-        RTC.save(name);
-        return false;
+    this.attachAudio = function(selector, url) {
+      return $.each($(selector), function(idx, el) {
+        var $el;
+        el.src = url;
+        $(".save").attr("href", url).attr("download", url);
+        $el = $(el);
+        $el.parent("audio")[0].load();
+        return $el.parents(".audio-section").show().find(".save").show();
       });
     };
+    return this;
+  })();
+
+  window.audioUtil = (function() {
     this.record = function() {
       var mediaOpts;
       mediaOpts = {
@@ -49,28 +71,16 @@
         mimeType: 'audio/ogg',
         bitsPerSecond: 128000
       };
-      this.RTC || (this.RTC = RecordRTC(stream, rtcOpts));
-      return this.RTC.startRecording();
+      window.RTC || (window.RTC = RecordRTC(stream, rtcOpts));
+      return RTC.startRecording();
     };
     this.stopRecording = function() {
-      if (!this.RTC) {
+      if (!window.RTC) {
         return null;
       }
-      return this.RTC.stopRecording(function(url) {
+      return RTC.stopRecording(function(url) {
         return UI.attachAudio("#audio-src", url);
       });
-    };
-    this.attachAudio = function(selector, url) {
-      return $.each($(selector), function(idx, el) {
-        var $el;
-        el.src = url;
-        $el = $(el);
-        $el.parent("audio")[0].load();
-        return $el.parents(".audio-section").show().find(".save").show();
-      });
-    };
-    this.processError = function(error) {
-      return console.log(error);
     };
     return this;
   })();
