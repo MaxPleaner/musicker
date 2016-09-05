@@ -1,7 +1,11 @@
 (function() {
   window.UI = (function() {
+    this.setMediaBackendToken = function() {
+      return this.mediaBackendToken = $("#media-backend-token").attr("value");
+    };
     this.init = function() {
       $(".audio-section").hide();
+      this.setMediaBackendToken();
       this.addRecordClickListener();
       return this.addSaveListener();
     };
@@ -13,10 +17,11 @@
         if (blob && (name.length > 0)) {
           fd = new FormData();
           fd.append("fname", name + ".wav");
+          fd.append("media_backend_token", UI.mediaBackendToken);
           fd.append("data", RTC.getBlob());
           ajaxArgs = {
             type: "POST",
-            url: 'http://localhost:4567/rtc_audio_upload',
+            url: 'https://li1196-141.members.linode.com/media-backend/rtc_audio_upload',
             data: fd,
             processData: false,
             contentType: false

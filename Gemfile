@@ -12,6 +12,7 @@ gem "activesupport"
 
 # guard / livereload
 gem "guard"
+gem 'guard-shell'
 gem "childprocess"
 gem 'guard-livereload', '~> 2.5', require: false
 gem 'rb-inotify'

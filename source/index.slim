@@ -7,7 +7,9 @@ html lang='en'
     link rel="stylesheet" href="./styles/index.css"
     script src="./scripts/jquery.js"
     script src="./scripts/RecordRTC.js"
-    script src="./scripts/index.js"
+    script src="./scripts/index.js"    
+
+    span#media-backend-token style="display: none" value=ENV["MEDIA_BACKEND_TOKEN"]
     
   body
 
@@ -23,4 +25,6 @@ html lang='en'
         input type='submit' value='save'
 
     javascript:
-      UI.init()
+      $(function(){
+        UI.init()
+      })

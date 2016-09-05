@@ -3,9 +3,12 @@ require 'byebug'
 require 'slim'
 require 'sass'
 require 'coffee-script'
+require 'dotenv'
 
 # Load stdlib dependencies
 require 'webrick'
+
+Dotenv.load
 
 # A block is called when the script is run
 # It prints no output

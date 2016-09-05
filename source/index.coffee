@@ -1,11 +1,15 @@
 window.UI = (() ->
 
+  this.setMediaBackendToken = () ->
+    this.mediaBackendToken = $("#media-backend-token").attr("value")  
+
   # UI.init is the only thing in this file that needs to be called
   this.init = () ->
     $(".audio-section").hide()
+    this.setMediaBackendToken()
     this.addRecordClickListener()
     this.addSaveListener()
-  
+
   this.addSaveListener = () ->
     $(".save").off("submit").on "submit", (e) ->
       name = $(e.currentTarget).find("[name='name']").val() || ""
@@ -13,10 +17,11 @@ window.UI = (() ->
       if blob && (name.length > 0)
         fd = new FormData()
         fd.append("fname", "#{name}.wav")
+        fd.append("media_backend_token", UI.mediaBackendToken)
         fd.append("data", RTC.getBlob())
         ajaxArgs =
           type: "POST"
-          url: 'http://localhost:4567/rtc_audio_upload'
+          url: 'https://li1196-141.members.linode.com/media-backend/rtc_audio_upload'
           data: fd,
           processData: false,
           contentType: false
