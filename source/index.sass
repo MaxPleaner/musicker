@@ -14,13 +14,24 @@ body, html
   padding: 10px
   margin: 10px
   
-.delete-btn
+@mixin pseudo-button 
   float: right
   border: 1px solid grey
   display: inline block
   padding: 5px
-  color: red
-  background: grey
+  margin: 5px
   &:hover
     cursor: pointer
     box-shadow: 0 0 5px red
+  
+.delete-btn
+  color: red
+  background: grey
+  @include pseudo-button
+
+.loop-btn
+  @include pseudo-button
+
+.btn-on
+  border: 3px solid grey
+  box-shadow: 0 0 5px silver

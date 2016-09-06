@@ -45,7 +45,10 @@ window.UI = (() ->
     this.attachAudio = (name, url) ->
       template = """
         <div class='audio-section section'>
-          <b class='name'>#{name}</b> <span class='delete-btn'>x</span><br>
+          <b class='name'>#{name}</b>
+          <span class='delete-btn'>x</span>
+          <span class='loop-btn'>start loop</span>
+          <br>
           <audio class='section' controls>
             <source type='audio/wav' src='#{url}'>
             </source>
@@ -55,8 +58,21 @@ window.UI = (() ->
       $template = $ template
       this.audioContainer().append $template
       this.addDeleteBtnListener($template)
-      
+      this.addLoopBtnListener($template)
     
+    this.addLoopBtnListener = ($template) ->
+      $btn = $template.find(".loop-btn")
+      $btn.off("click").on "click", (e) ->
+        $btn = $(e.currentTarget)
+        $audio = $btn.parents(".audio-section").find("audio")
+        $btn.toggleClass("btn-on")
+        if $btn.hasClass("btn-on")
+          $btn.text("stop loop")
+          $audio.attr("loop", true)
+        else
+          $btn.text("start loop")
+          $audio.removeAttr("loop")
+
     this.addRecordClickListener = () ->
       $("#record").off("click").on "click", (e) ->
         $el = $(e.currentTarget)
