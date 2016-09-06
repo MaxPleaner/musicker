@@ -117,6 +117,8 @@ window.UI = (() ->
           else if timeElapsed > endTime
             if $(audio).attr("loop") == "loop"
               audio.currentTime = startTime
+            else
+              audio.pause()
           true
       
     this.addLoopBtnListener = ($template) ->
