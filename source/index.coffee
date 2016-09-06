@@ -78,8 +78,10 @@ window.UI = (() ->
         $el = $(e.currentTarget)
         if $el.attr("recording") == "true"
           UI.DomEvents.recordingDone($el)
+          $("#recording-status").text("")
         else
           UI.DomEvents.recordingStarted($el)
+          $("#recording-status").text("Recording")
           
     this.addDeleteBtnListener = ($template) ->
       $template.find(".delete-btn").off("click").on "click", (e) ->
