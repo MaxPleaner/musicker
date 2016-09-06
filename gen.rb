@@ -45,7 +45,7 @@ class Gen
   
   # Deletes and recreates dist/
   def refresh_gen_out_dir # => self/,,aw3
-    `rm -rf #{gen_out_dir}; mkdir #{gen_out_dir}`
+    `rm -rf #{gen_out_dir}/*`
     `mkdir #{gen_out_dir}scripts/`
     `mkdir #{gen_out_dir}styles/`
     self

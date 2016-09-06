@@ -13,16 +13,11 @@ html lang='en'
     
   body
 
-    button id="record" record
-    br
+    section
+      button#record record
 
-    div.audio-section
-      form.save action="#"
-        audio controls=''
-          source id="audio-src" type='audio/ogg'
-        br
-        input type='text' name='name' placeholder='name'
-        input type='submit' value='save'
+    section
+      div#audio-index
 
     javascript:
       $(function(){
