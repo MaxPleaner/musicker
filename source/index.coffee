@@ -52,14 +52,73 @@ window.UI = (() ->
           <audio class='section' controls>
             <source type='audio/wav' src='#{url}'>
             </source>
-          </audio>
+          </audio> <br>
+          <b> start time: </b> <span class="start-time-val"></span>
+          <br>
+          <input type="range" class="time-slider start-time" min="0" value="0" max='0' step="0.1">
+          <br>
+          <b> end time </b>: <span class="end-time-val"></span>
+          <br>
+          <input type="range" class="time-slider end-time" min="0" value="0" max='0' step="0.1">
         </div>
       """
       $template = $ template
       this.audioContainer().append $template
       this.addDeleteBtnListener($template)
       this.addLoopBtnListener($template)
+      this.addSliderListeners($template)
+      this.setPlaybackBounds($template)
     
+    this.addSliderListeners = ($template) ->
+      audio = $template.find("audio")[0]
+      $(audio).off("canplaythrough").on "canplaythrough", (e) ->
+        audio = e.currentTarget
+        maxTime = audio.duration
+        $.each $template.find(".time-slider"), (idx, el) ->
+          $slider = $ el
+          $slider.attr("max", maxTime)
+        $template.find(".end-time").attr("value", maxTime)
+        $startTime = $template.find(".start-time")
+        $endTime = $template.find(".end-time")
+        $startTime.off("change").on "change", (e) ->
+          $slider = $(e.currentTarget)
+          sliderVal = $slider.val()
+          $audioSection = $slider.parents(".audio-section")
+          $audio = $audioSection.find("audio")
+          $audio.attr("start-time", sliderVal)
+          $startTimeVal = $audioSection.find(".start-time-val")
+          $startTimeVal.text(sliderVal)
+        $endTime.off("change").on "change", (e) ->
+          $slider = $(e.currentTarget)
+          sliderVal = $slider.val()
+          $audioSection = $slider.parents(".audio-section")
+          $audio = $audioSection.find("audio")
+          $audio.attr("end-time", $slider.val())
+          $endTimeVal = $audioSection.find(".end-time-val")
+          $endTimeVal.text(sliderVal)
+        $endTime.trigger("change")
+        $startTime.trigger("change")
+          
+    this.setPlaybackBounds = ($template) ->
+      $audio = $template.find("audio")
+      $audio.off("pause").on "pause", (e) ->
+        $audio = $(e.currentTarget)
+        $audio.off("timeupdate")
+        
+      $audio.off("play").on "play", (e) ->
+        $audio = $(e.currentTarget)
+        $audio.off("timeupdate").on "timeupdate", (e) ->
+          audio = e.currentTarget
+          startTime = audio.getAttribute("start-time")
+          endTime = audio.getAttribute("end-time")
+          timeElapsed = audio.currentTime
+          if timeElapsed <  startTime
+            audio.currentTime = endTime
+          else if timeElapsed > endTime
+            if $(audio).attr("loop") == "loop"
+              audio.currentTime = startTime
+          true
+      
     this.addLoopBtnListener = ($template) ->
       $btn = $template.find(".loop-btn")
       $btn.off("click").on "click", (e) ->
@@ -141,7 +200,6 @@ window.UI = (() ->
     this.MediaBackend.getAudioList().then (response) ->
       response.forEach (audioRef) ->
         UI.DomEvents.attachAudio(audioRef.name, audioRef.url)
-
   this
 
 )()
