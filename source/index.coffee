@@ -11,7 +11,7 @@ window.UI = (() ->
       this.tokenParam = "media_backend_token=#{this.mediaBackendToken}"
     
     this.getAudioList = () ->
-      url = "#{hostUrl}/audio_index?"
+      url = "#{this.hostUrl}/audio_index?"
       $.get(url)
     
     this.sendBlob = (blobObj) ->
@@ -28,12 +28,19 @@ window.UI = (() ->
       $.ajax(ajaxArgs)
       
     this.deleteAudio = (name) ->
-      url = "#{hostUrl}/delete_audio?#{this.tokenParam}&name=#{name}"
+      url = "#{this.hostUrl}/delete_audio?#{this.tokenParam}&name=#{name}"
       $.ajax(
         type: "DELETE",
         url: url
       )
-      
+    
+    this.trimAudio = (name, startTime, endTime) ->
+      url = "#{this.hostUrl}/trim_audio?#{this.tokenParam}&name=#{name}&startTime=#{startTime}&endTime=#{endTime}"      
+      $.ajax(
+        type: "PUT",
+        url: url
+      ).then (response) -> response.url
+
     this
     
   )()
@@ -49,17 +56,24 @@ window.UI = (() ->
           <span class='delete-btn'>x</span>
           <span class='loop-btn'>start loop</span>
           <br>
+          <span class="current-time"></span>
           <audio class='section' controls>
             <source type='audio/wav' src='#{url}'>
             </source>
           </audio> <br>
-          <b> start time: </b> <span class="start-time-val"></span>
-          <br>
-          <input type="range" class="time-slider start-time" min="0" value="0" max='0' step="0.1">
-          <br>
-          <b> end time </b>: <span class="end-time-val"></span>
-          <br>
-          <input type="range" class="time-slider end-time" min="0" value="0" max='0' step="0.1">
+          <div class='slider-section'>
+            <b> start time: </b> <span class="start-time-val"></span>
+            <br>
+            <input type="range" class="time-slider start-time" min="0" value="0" max='0' step="0.01">
+          </div>
+          <div class='slider-section'>
+            <b> end time </b>: <span class="end-time-val"></span>
+            <br>
+            <input type="range" class="time-slider end-time" min="0" value="0" max='0' step="0.01">
+          </div>
+          <div class='slider-section'>
+            <button class='save'>save</button>
+          </div>
         </div>
       """
       $template = $ template
@@ -68,7 +82,20 @@ window.UI = (() ->
       this.addLoopBtnListener($template)
       this.addSliderListeners($template)
       this.setPlaybackBounds($template)
-    
+      this.addSaveListener($template)
+
+    this.addSaveListener = ($template) ->
+      $saveBtn = $template.find(".save")
+      $saveBtn.off("click").on "click", (e) ->
+        $btn = $(e.currentTarget)
+        $audioSection = $btn.parents(".audio-section")
+        startTime = $audioSection.find(".start-time-val").text()
+        endTime = $audioSection.find(".end-time-val").text()
+        name = $audioSection.find(".name").text()
+        UI.MediaBackend.trimAudio(name, startTime, endTime).then (newUrl) ->
+          $audioSection.find("audio source")[0].src = newUrl
+          $audioSection.find("audio")[0].load()
+      
     this.addSliderListeners = ($template) ->
       audio = $template.find("audio")[0]
       $(audio).off("canplaythrough").on "canplaythrough", (e) ->
@@ -109,15 +136,16 @@ window.UI = (() ->
         $audio = $(e.currentTarget)
         $audio.off("timeupdate").on "timeupdate", (e) ->
           audio = e.currentTarget
-          startTime = audio.getAttribute("start-time")
-          endTime = audio.getAttribute("end-time")
-          timeElapsed = audio.currentTime
+          $audio = $ audio
+          startTime = Number audio.getAttribute("start-time")
+          endTime = Number audio.getAttribute("end-time")
+          timeElapsed = audio.currentTime          
+          $audio.parents(".audio-section").find(".current-time").text(timeElapsed)
           if timeElapsed <  startTime
             audio.currentTime = endTime
           else if timeElapsed > endTime
-            if $(audio).attr("loop") == "loop"
-              audio.currentTime = startTime
-            else
+            audio.currentTime = startTime
+            unless $audio.attr("loop") == "loop"
               audio.pause()
           true
       
